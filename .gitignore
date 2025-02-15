@@ -16,8 +16,5 @@ node_modules
 # Hardhat Ignition default folder for deployments against a local node
 ignition/deployments/chain-31337
 
-# Hardhat Config file will not be updated
-hardhat.config.js
-
 # MacOS
 .DS_Store
