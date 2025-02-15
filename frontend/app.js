@@ -3,7 +3,7 @@
 
 // Contract details - hardoced for now, already deployed on Sepolia testnet.
 // Put here your actual contract address:
-const contractAddress = "0xe86d6525bb7B4d44Cc2470Ac740134301F4Fa230"; // Sepolia contract
+const contractAddress = "0x71EF63b201B0fB6d65030318fa9Ea8157d61e3f0"; // Sepolia contract
 var contract = null;
 
 fetch("./Number.json")
