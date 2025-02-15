@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3 DApp</title>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script defer type="module" src="app.js"></script>
+</head>
+<body>
+    <h1>Numbers - Web3 DApp</h1>
+    <button id="connectWallet" disabled>Connect YOUR Wallet</button>
+    <p><b>Wallet status:</b> <span id="walletstatus">Not connected</span></p>
+    <hr>
+    <h2>Set Number on Smart Contr   act</h2>
+    <input type="number" id="numberInput" placeholder="Enter a number" disabled>
+    <button id="setNumberButton" disabled>call setNumber()</button>
+    <p id="status"></p>
+    <hr>
+    <h2>Get Number from Smart Contract</h2>
+    <button id="getNumberButton" disabled>call number()</button>
+    <p id="number"></p>
+</body>
+</html>
