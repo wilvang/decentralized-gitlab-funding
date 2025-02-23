@@ -35,6 +35,7 @@ contract FundManager is IFundManager {
      */
     receive() external payable {
         funderContributions[msg.sender] += msg.value;
+	emit ContributionReceived(msg.sender, msg.value);    
     }
 
     /**
