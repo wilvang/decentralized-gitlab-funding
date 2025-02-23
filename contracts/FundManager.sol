@@ -35,6 +35,7 @@ contract FundManager is IFundManager {
      */
     receive() external payable {
         funderContributions[msg.sender] += msg.value;
+	emit ContributionReceived(msg.sender, msg.value);    
     }
 
     /**
@@ -49,6 +50,9 @@ contract FundManager is IFundManager {
         funderContributions[msg.sender] -= amount;
         // Add the amount to the specified issue's funds
         issueFunds[issueId] += amount;
+        trackFunds[msg.sender][issueId] += amount;
+
+	emit FundsAllocated(msg.sender, issueId, amount);
     }
 
     /**
@@ -69,6 +73,8 @@ contract FundManager is IFundManager {
         trackFunds[msg.sender][toIssueId] += amount;
         // Add the amount to the destination issue's funds
         issueFunds[toIssueId] += amount;
+
+        emit FundsReallocated(msg.sender, fromIssueId, toIssueId, amount);
     }
 
     /**

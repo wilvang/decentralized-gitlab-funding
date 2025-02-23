@@ -16,9 +16,10 @@ interface IDeveloperPayouts {
 
     /**
      * @notice Submit a merge request for a specific issue.
+     * @param mergeRequest The ID of the merge request proposed.
      * @param issueId The ID of the issue for which the merge request is submitted.
      */
-    function submitMergeRequest(uint256 issueId) external;
+    function submitMergeRequest(uint256 mergeRequest, uint256 issueId) external;
 
     /**
      * @notice Request payment for a completed issue.
