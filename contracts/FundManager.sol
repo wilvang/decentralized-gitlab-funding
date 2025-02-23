@@ -49,6 +49,7 @@ contract FundManager is IFundManager {
         funderContributions[msg.sender] -= amount;
         // Add the amount to the specified issue's funds
         issueFunds[issueId] += amount;
+        trackFunds[msg.sender][issueId] += amount;
     }
 
     /**
