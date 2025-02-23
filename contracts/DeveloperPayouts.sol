@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.28;
 
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/IFundManager.sol";
 import "./interfaces/IValidatorMultiSig.sol";
 import "./interfaces/IDeveloperPayouts.sol";
@@ -25,7 +25,7 @@ contract DeveloperPayouts is IDeveloperPayouts, ReentrancyGuard {
 
     // Events for searchable EVM logging
     event IssueSelected(address indexed developer, uint256 indexed issueId);
-    event MergeRequestSubmitted(address indexed developer, uint256 indexed issueId);
+    event MergeRequestSubmitted(address indexed developer,uint256 indexed mergeRequest, uint256 indexed issueId);
     event PaymentRequested(address indexed developer, uint256 indexed issueId);
 
     /**
@@ -51,12 +51,12 @@ contract DeveloperPayouts is IDeveloperPayouts, ReentrancyGuard {
     /**
      * @notice Submit a merge request for a specific issue.
      * @dev This function allows a developer to submit a merge request for an issue.
+     * @param mergeRequest The ID of the merge request proposed.
      * @param issueId The ID of the issue for which the merge request is submitted.
      */
-    function submitMergeRequest(uint256 issueId) external {
-        proposals[msg.sender][issueId] = issueId;
-        validatorMultiSig.approveWork(issueId);
-        emit MergeRequestSubmitted(msg.sender, issueId);
+    function submitMergeRequest(uint256 mergeRequest, uint256 issueId) external {
+        proposals[msg.sender][issueId] = mergeRequest;
+        emit MergeRequestSubmitted(msg.sender, mergeRequest, issueId);
     }
 
     /**
