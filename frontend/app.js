@@ -1,7 +1,7 @@
 // Contract addresses - replace with your actual contract addresses
-const fundManagerAddress = "0xYourFundManagerAddress";
-const validatorMultiSigAddress = "0xYourValidatorMultiSigAddress";
-const developerPayoutsAddress = "0xYourDeveloperPayoutsAddress";
+const fundManagerAddress = "0x2b8B0BFaB44238a6B4eAD0aB1f5015F4a4B5D246";
+const validatorMultiSigAddress = "0xFFAa3bfC5f619433bf8F59e400DD717601f71822";
+const developerPayoutsAddress = "0xc755B65fd5bcaD1D0EBaff64eADA551144D8fD38";
 
 let fundManager, validatorMultiSig, developerPayouts;
 
@@ -29,7 +29,11 @@ fetch("./ValidatorMultiSig.json")
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     window.ethereum.request({ method: "eth_requestAccounts" });
     const signer = provider.getSigner();
-    validatorMultiSig = new ethers.Contract(validatorMultiSigAddress, data.abi, signer);
+    validatorMultiSig = new ethers.Contract(
+      validatorMultiSigAddress,
+      data.abi,
+      signer
+    );
     enableValidatorMultiSigButtons();
   });
 
@@ -43,7 +47,11 @@ fetch("./DeveloperPayouts.json")
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     window.ethereum.request({ method: "eth_requestAccounts" });
     const signer = provider.getSigner();
-    developerPayouts = new ethers.Contract(developerPayoutsAddress, data.abi, signer);
+    developerPayouts = new ethers.Contract(
+      developerPayoutsAddress,
+      data.abi,
+      signer
+    );
     enableDeveloperPayoutsButtons();
   });
 
@@ -51,7 +59,9 @@ fetch("./DeveloperPayouts.json")
 function enableFundManagerButtons() {
   if (fundManager) {
     document.getElementById("allocateFundsButton").removeAttribute("disabled");
-    document.getElementById("reallocateFundsButton").removeAttribute("disabled");
+    document
+      .getElementById("reallocateFundsButton")
+      .removeAttribute("disabled");
     document.getElementById("contributeButton").removeAttribute("disabled");
   }
 }
@@ -67,7 +77,9 @@ function enableValidatorMultiSigButtons() {
 function enableDeveloperPayoutsButtons() {
   if (developerPayouts) {
     document.getElementById("selectIssueButton").removeAttribute("disabled");
-    document.getElementById("submitMergeRequestButton").removeAttribute("disabled");
+    document
+      .getElementById("submitMergeRequestButton")
+      .removeAttribute("disabled");
     document.getElementById("requestPaymentButton").removeAttribute("disabled");
   }
 }
@@ -79,7 +91,8 @@ async function connectWallet() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     await window.ethereum.request({ method: "eth_requestAccounts" });
     const signer = provider.getSigner();
-    document.getElementById("walletstatus").innerText = "Connected account: " + await signer.getAddress();
+    document.getElementById("walletstatus").innerText =
+      "Connected account: " + (await signer.getAddress());
   } else {
     console.log("MetaMask not detected!");
     alert("MetaMask not detected!");
@@ -101,10 +114,12 @@ async function contribute() {
     // Send transaction to the FundManager contract
     const tx = await signer.sendTransaction({
       to: fundManagerAddress,
-      value: ethers.utils.parseEther(amount) // Convert the amount to Wei
+      value: ethers.utils.parseEther(amount), // Convert the amount to Wei
     });
 
-    document.getElementById("status").innerText = `Transaction sent: ${tx.hash}`;
+    document.getElementById(
+      "status"
+    ).innerText = `Transaction sent: ${tx.hash}`;
 
     // Wait for confirmation
     await tx.wait();
@@ -119,11 +134,14 @@ async function allocateFunds() {
   try {
     const issueId = document.getElementById("issueIdInput").value;
     const amount = document.getElementById("amountInput").value;
-    if (!issueId || !amount) throw new Error("Enter valid issue ID and amount!");
+    if (!issueId || !amount)
+      throw new Error("Enter valid issue ID and amount!");
 
     // Send transaction using the FundManager contract
     const tx = await fundManager.allocateFunds(issueId, amount);
-    document.getElementById("status").innerText = `Transaction sent: ${tx.hash}`;
+    document.getElementById(
+      "status"
+    ).innerText = `Transaction sent: ${tx.hash}`;
 
     // Wait for confirmation
     await tx.wait();
@@ -139,11 +157,18 @@ async function reallocateFunds() {
     const fromIssueId = document.getElementById("fromIssueIdInput").value;
     const toIssueId = document.getElementById("toIssueIdInput").value;
     const amount = document.getElementById("amountInput").value;
-    if (!fromIssueId || !toIssueId || !amount) throw new Error("Enter valid issue IDs and amount!");
+    if (!fromIssueId || !toIssueId || !amount)
+      throw new Error("Enter valid issue IDs and amount!");
 
     // Send transaction using the FundManager contract
-    const tx = await fundManager.reallocateFunds(fromIssueId, toIssueId, amount);
-    document.getElementById("status").innerText = `Transaction sent: ${tx.hash}`;
+    const tx = await fundManager.reallocateFunds(
+      fromIssueId,
+      toIssueId,
+      amount
+    );
+    document.getElementById(
+      "status"
+    ).innerText = `Transaction sent: ${tx.hash}`;
 
     // Wait for confirmation
     await tx.wait();
@@ -161,7 +186,9 @@ async function approveWork() {
 
     // Send transaction using the ValidatorMultiSig contract
     const tx = await validatorMultiSig.approveWork(mergeRequest);
-    document.getElementById("status").innerText = `Transaction sent: ${tx.hash}`;
+    document.getElementById(
+      "status"
+    ).innerText = `Transaction sent: ${tx.hash}`;
 
     // Wait for confirmation
     await tx.wait();
@@ -179,7 +206,9 @@ async function selectIssue() {
 
     // Send transaction using the DeveloperPayouts contract
     const tx = await developerPayouts.selectIssue(issueId);
-    document.getElementById("status").innerText = `Transaction sent: ${tx.hash}`;
+    document.getElementById(
+      "status"
+    ).innerText = `Transaction sent: ${tx.hash}`;
 
     // Wait for confirmation
     await tx.wait();
@@ -194,11 +223,14 @@ async function submitMergeRequest() {
   try {
     const mergeRequest = document.getElementById("mergeRequestInput").value;
     const issueId = document.getElementById("issueIdInput").value;
-    if (!mergeRequest || !issueId) throw new Error("Enter valid merge request ID and issue ID!");
+    if (!mergeRequest || !issueId)
+      throw new Error("Enter valid merge request ID and issue ID!");
 
     // Send transaction using the DeveloperPayouts contract
     const tx = await developerPayouts.submitMergeRequest(mergeRequest, issueId);
-    document.getElementById("status").innerText = `Transaction sent: ${tx.hash}`;
+    document.getElementById(
+      "status"
+    ).innerText = `Transaction sent: ${tx.hash}`;
 
     // Wait for confirmation
     await tx.wait();
@@ -216,7 +248,9 @@ async function requestPayment() {
 
     // Send transaction using the DeveloperPayouts contract
     const tx = await developerPayouts.requestPayment(mergeRequest);
-    document.getElementById("status").innerText = `Transaction sent: ${tx.hash}`;
+    document.getElementById(
+      "status"
+    ).innerText = `Transaction sent: ${tx.hash}`;
 
     // Wait for confirmation
     await tx.wait();
@@ -227,11 +261,27 @@ async function requestPayment() {
 }
 
 // Attach event listeners to buttons
-document.getElementById("contributeButton").addEventListener("click", contribute);
-document.getElementById("allocateFundsButton").addEventListener("click", allocateFunds);
-document.getElementById("reallocateFundsButton").addEventListener("click", reallocateFunds);
-document.getElementById("approveWorkButton").addEventListener("click", approveWork);
-document.getElementById("selectIssueButton").addEventListener("click", selectIssue);
-document.getElementById("submitMergeRequestButton").addEventListener("click", submitMergeRequest);
-document.getElementById("requestPaymentButton").addEventListener("click", requestPayment);
-document.getElementById("connectWallet").addEventListener("click", connectWallet);
+document
+  .getElementById("contributeButton")
+  .addEventListener("click", contribute);
+document
+  .getElementById("allocateFundsButton")
+  .addEventListener("click", allocateFunds);
+document
+  .getElementById("reallocateFundsButton")
+  .addEventListener("click", reallocateFunds);
+document
+  .getElementById("approveWorkButton")
+  .addEventListener("click", approveWork);
+document
+  .getElementById("selectIssueButton")
+  .addEventListener("click", selectIssue);
+document
+  .getElementById("submitMergeRequestButton")
+  .addEventListener("click", submitMergeRequest);
+document
+  .getElementById("requestPaymentButton")
+  .addEventListener("click", requestPayment);
+document
+  .getElementById("connectWallet")
+  .addEventListener("click", connectWallet);

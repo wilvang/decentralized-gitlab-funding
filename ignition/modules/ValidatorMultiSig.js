@@ -1,14 +1,13 @@
 const { buildModule } = require("@nomicfoundation/hardhat-ignition/modules");
 require("dotenv").config();
 
-module.exports = buildModule("validatorModule", (m) => {
-  const validatorMultiSig = m.contract("ValidatorMultiSig", {
-    arg1: process.env.FUND_MANAGER_ADDRESS, // Replace with the actual address if needed
-    arg2: process.env.VALIDATORS,
-    dependencies: [
-      require("../../artifacts/@openzeppelin/contracts/utils/ReentrancyGuard.sol/ReentrancyGuard.json")
-    ]  
-   });
+VALIDATORS=["0x0A098Eda01Ce92ff4A4CCb7A4fFFb5A43EBC70DC","0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db","0xdD870fA1b7C4700F2BD7f44238821C26f7392148"]
 
-  return { validatorMultiSig };
-});
+module.exports = buildModule("validatorModule", (m) => {
+  const validatorMultiSig = m.contract("ValidatorMultiSig", [
+    process.env.FUND_MANAGER_ADDRESS,
+    VALIDATORS
+    ]);
+   return { validatorMultiSig }; 
+  });  
+
