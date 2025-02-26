@@ -8,17 +8,44 @@
     <script defer type="module" src="app.js"></script>
 </head>
 <body>
-    <h1>Numbers - Web3 DApp</h1>
-    <button id="connectWallet" disabled>Connect YOUR Wallet</button>
+    <h1>Web3 DApp for Fund Management</h1>
+    <button id="connectWallet" enabled>Connect YOUR Wallet</button>
     <p><b>Wallet status:</b> <span id="walletstatus">Not connected</span></p>
     <hr>
-    <h2>Set Number on Smart Contr   act</h2>
-    <input type="number" id="numberInput" placeholder="Enter a number" disabled>
-    <button id="setNumberButton" disabled>call setNumber()</button>
-    <p id="status"></p>
+
+    <h2>Fund Manager</h2>
+    <input type="text" id="contributionAmountInput" placeholder="Enter amount in ETH" enabled>
+    <button id="contributeButton" enabled>Contribute</button>
+    <br>
+    <input type="text" id="issueIdInput" placeholder="Enter issue ID" enabled>
+    <input type="text" id="amountInput" placeholder="Enter amount" enabled>
+    <button id="allocateFundsButton" enabled>Allocate Funds</button>
+    <br>
+    <input type="text" id="fromIssueIdInput" placeholder="From issue ID" enabled>
+    <input type="text" id="toIssueIdInput" placeholder="To issue ID" enabled>
+    <input type="text" id="amountInput" placeholder="Enter amount" enabled>
+    <button id="reallocateFundsButton" enabled>Reallocate Funds</button>
     <hr>
-    <h2>Get Number from Smart Contract</h2>
-    <button id="getNumberButton" disabled>call number()</button>
-    <p id="number"></p>
+
+    <h2>Validator MultiSig</h2>
+    <input type="text" id="mergeRequestInput" placeholder="Enter merge request ID" enabled>
+    <button id="approveWorkButton" enabled>Approve Work</button>
+    <hr>
+
+    <h2>Developer Payouts</h2>
+    <input type="text" id="issueIdInput" placeholder="Enter issue ID" enabled>
+    <button id="selectIssueButton" enabled>Select Issue</button>
+    <br>
+    <input type="text" id="mergeRequestInput" placeholder="Enter merge request ID" enabled>
+    <input type="text" id="issueIdInput" placeholder="Enter issue ID" enabled>
+    <button id="submitMergeRequestButton" enabled>Submit Merge Request</button>
+    <br>
+    <input type="text" id="mergeRequestInput" placeholder="Enter merge request ID" enabled>
+    <button id="requestPaymentButton" enabled>Request Payment</button>
+    <hr>
+
+    <p id="status"></p>
 </body>
 </html>
+
+
