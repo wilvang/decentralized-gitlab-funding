@@ -151,7 +151,7 @@ async function allocateFunds() {
   }
 }
 
-// Reallocate funds function
+// Reallocates funds from one issue to another
 async function reallocateFunds() {
   try {
     const fromIssueId = document.getElementById("fromIssueIdInput").value;
@@ -159,6 +159,16 @@ async function reallocateFunds() {
     const amount = document.getElementById("amountInput").value;
     if (!fromIssueId || !toIssueId || !amount)
       throw new Error("Enter valid issue IDs and amount!");
+
+    // Fetch open issues
+    const openIssues = await fetchOpenIssues();
+    const fromIssueExists = openIssues.some((issue) => issue.id == fromIssueId);
+    const toIssueExists = openIssues.some((issue) => issue.id == toIssueId);
+
+    if (!fromIssueExists)
+      throw new Error("From issue ID not found in open issues!");
+    if (!toIssueExists)
+      throw new Error("To issue ID not found in open issues!");
 
     // Send transaction using the FundManager contract
     const tx = await fundManager.reallocateFunds(
@@ -198,11 +208,17 @@ async function approveWork() {
   }
 }
 
-// Select issue function
+// Selects a funded issue
 async function selectIssue() {
   try {
     const issueId = document.getElementById("issueIdInput").value;
     if (!issueId) throw new Error("Enter a valid issue ID!");
+
+    // Fetch open issues
+    const openIssues = await fetchOpenIssues();
+    const issueExists = openIssues.some((issue) => issue.id == issueId);
+
+    if (!issueExists) throw new Error("Issue ID not found in open issues!");
 
     // Send transaction using the DeveloperPayouts contract
     const tx = await developerPayouts.selectIssue(issueId);
@@ -218,13 +234,25 @@ async function selectIssue() {
   }
 }
 
-// Submit merge request function
 async function submitMergeRequest() {
   try {
     const mergeRequest = document.getElementById("mergeRequestInput").value;
     const issueId = document.getElementById("issueIdInput").value;
+    const expectedAuthorUsername = "developer_username"; // Replace with the expected author's username
+
     if (!mergeRequest || !issueId)
       throw new Error("Enter valid merge request ID and issue ID!");
+
+    // Check if the merge request exists
+    const mergeRequestExists = await checkMergeRequestExists(mergeRequest);
+    if (!mergeRequestExists) throw new Error("Merge request does not exist!");
+
+    // Verify the merge request author
+    const authorVerified = await verifyMergeRequestAuthor(
+      mergeRequest,
+      expectedAuthorUsername
+    );
+    if (!authorVerified) throw new Error("Author verification failed!");
 
     // Send transaction using the DeveloperPayouts contract
     const tx = await developerPayouts.submitMergeRequest(mergeRequest, issueId);
@@ -240,11 +268,74 @@ async function submitMergeRequest() {
   }
 }
 
-// Request payment function
+// Checks if the merge request exsists
+async function checkMergeRequestExists(mergeRequestId) {
+  const response = await fetch(
+    `https://gitlab.com/api/v4/projects/:id/merge_requests/${mergeRequestId}`,
+    {
+      headers: { "PRIVATE-TOKEN": "your_access_token" },
+    }
+  );
+
+  if (response.status === 200) {
+    const mergeRequest = await response.json();
+    return mergeRequest.id === parseInt(mergeRequestId);
+  } else {
+    return false;
+  }
+}
+
+// Verifies the author of the merge request
+async function verifyMergeRequestAuthor(
+  mergeRequestId,
+  expectedAuthorUsername
+) {
+  try {
+    const mergeRequest = await fetchMergeRequestDetails(mergeRequestId);
+    const authorUsername = mergeRequest.author.username;
+
+    if (authorUsername === expectedAuthorUsername) {
+      console.log(`Author verified: ${authorUsername}`);
+      return true;
+    } else {
+      console.log(
+        `Author mismatch: expected ${expectedAuthorUsername}, got ${authorUsername}`
+      );
+      return false;
+    }
+  } catch (error) {
+    console.error(`Error verifying author: ${error.message}`);
+    return false;
+  }
+}
+
 async function requestPayment() {
   try {
     const mergeRequest = document.getElementById("mergeRequestInput").value;
-    if (!mergeRequest) throw new Error("Enter a valid merge request ID!");
+    const issueId = document.getElementById("issueIdInput").value;
+    const expectedAuthorUsername = "developer_username"; // Replace with the expected author's username
+
+    if (!mergeRequest || !issueId)
+      throw new Error("Enter valid merge request ID and issue ID!");
+
+    // Check if the merge request exists
+    const mergeRequestExists = await checkMergeRequestExists(mergeRequest);
+    if (!mergeRequestExists) throw new Error("Merge request does not exist!");
+
+    // Verify the merge request author
+    const authorVerified = await verifyMergeRequestAuthor(
+      mergeRequest,
+      expectedAuthorUsername
+    );
+    if (!authorVerified) throw new Error("Author verification failed!");
+
+    // Check if the merge request has closed the issue
+    const issueClosed = await checkMergeRequestClosedIssue(
+      mergeRequest,
+      issueId
+    );
+    if (!issueClosed)
+      throw new Error("Merge request did not close the specified issue!");
 
     // Send transaction using the DeveloperPayouts contract
     const tx = await developerPayouts.requestPayment(mergeRequest);
@@ -258,6 +349,76 @@ async function requestPayment() {
   } catch (error) {
     document.getElementById("status").innerText = `Error: ${error.message}`;
   }
+}
+
+// Verifies the author of the merge request
+async function verifyMergeRequestAuthor(
+  mergeRequestId,
+  expectedAuthorUsername
+) {
+  try {
+    const mergeRequest = await fetchMergeRequestDetails(mergeRequestId);
+    const authorUsername = mergeRequest.author.username;
+
+    if (authorUsername === expectedAuthorUsername) {
+      console.log(`Author verified: ${authorUsername}`);
+      return true;
+    } else {
+      console.log(
+        `Author mismatch: expected ${expectedAuthorUsername}, got ${authorUsername}`
+      );
+      return false;
+    }
+  } catch (error) {
+    console.error(`Error verifying author: ${error.message}`);
+    return false;
+  }
+}
+
+// Fetch merge request details
+async function fetchMergeRequestDetails(mergeRequestId) {
+  const response = await fetch(
+    `https://gitlab.com/api/v4/projects/:id/merge_requests/${mergeRequestId}`,
+    {
+      headers: { "PRIVATE-TOKEN": "your_access_token" },
+    }
+  );
+
+  if (response.status === 200) {
+    const mergeRequest = await response.json();
+    return mergeRequest;
+  } else {
+    throw new Error("Merge request not found!");
+  }
+}
+
+// Checks if the merge request has closed the issue
+async function checkMergeRequestClosedIssue(mergeRequestId, issueId) {
+  const response = await fetch(
+    `https://gitlab.com/api/v4/projects/:id/merge_requests/${mergeRequestId}/closes_issues`,
+    {
+      headers: { "PRIVATE-TOKEN": "your_access_token" },
+    }
+  );
+
+  if (response.status === 200) {
+    const closedIssues = await response.json();
+    return closedIssues.some((issue) => issue.id == issueId);
+  } else {
+    throw new Error("Failed to fetch closed issues!");
+  }
+}
+
+// Resturns all open issues
+async function fetchOpenIssues() {
+  const response = await fetch(
+    "https://gitlab.com/api/v4/projects/:id/issues?state=opened",
+    {
+      headers: { "PRIVATE-TOKEN": "your_access_token" },
+    }
+  );
+  const issues = await response.json();
+  return issues;
 }
 
 // Attach event listeners to buttons
